@@ -29,6 +29,7 @@ export interface AppState {
   searchOpen: boolean;
   searchMode: "chart" | "watchlist";
   theme: "dark" | "light";
+  focusMode: boolean;
 }
 
 const readLocal = (key: string, fallback: string) => {
@@ -56,6 +57,7 @@ export const useApp = create<AppState>(() => ({
   searchOpen: false,
   searchMode: "chart",
   theme: "dark",
+  focusMode: false,
 }));
 
 export function initLocalState() {

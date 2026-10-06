@@ -9,12 +9,12 @@ import { IconButton, cn } from "./ui/primitives";
 
 type Tab = "holdings" | "open" | "history" | "trades";
 
-export function BottomPanel() {
+export function BottomPanel({ collapsed, onCollapsedChange }: { collapsed: boolean; onCollapsedChange: (v: boolean) => void }) {
+  const setCollapsed = onCollapsedChange;
   const orders = useApp((s) => s.orders);
   const trades = useApp((s) => s.trades);
   const rows = useHoldingRows();
   const [tab, setTab] = useState<Tab>("holdings");
-  const [collapsed, setCollapsed] = useState(false);
 
   const open = useMemo(() => orders.filter((o) => o.status === "OPEN" || o.status === "TRIGGERED"), [orders]);
   const history = useMemo(() => orders.filter((o) => o.status !== "OPEN" && o.status !== "TRIGGERED").slice(0, 100), [orders]);

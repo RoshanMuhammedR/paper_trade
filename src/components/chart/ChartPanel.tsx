@@ -11,6 +11,7 @@ import {
   ChevronsRight,
   Maximize2,
   Minimize2,
+  PenLine,
   Plus,
   Search,
   SlidersHorizontal,
@@ -52,7 +53,21 @@ function readLocalPrefs(): ChartPrefs {
   return DEFAULT_PREFS;
 }
 
-export function ChartPanel() {
+export function ChartPanel({ toolbarLeft, toolbarRight }: { toolbarLeft?: React.ReactNode; toolbarRight?: React.ReactNode } = {}) {
+  const [showTools, setShowTools] = useState(true);
+  useEffect(() => {
+    try {
+      setShowTools(localStorage.getItem("pt-show-tools") !== "0");
+    } catch {}
+  }, []);
+  const toggleTools = () => {
+    setShowTools((v) => {
+      try {
+        localStorage.setItem("pt-show-tools", v ? "0" : "1");
+      } catch {}
+      return !v;
+    });
+  };
   const symbol = useApp((s) => s.activeSymbol);
   const theme = useApp((s) => s.theme);
   const meta = useApp((s) => s.activeMeta);
@@ -167,6 +182,7 @@ export function ChartPanel() {
     <div ref={panelRef} className="flex h-full min-h-0 flex-col bg-panel">
       {/* Top toolbar */}
       <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-line px-1.5">
+        {toolbarLeft}
         <button
           onClick={() => openSearch("chart")}
           className="flex h-8 shrink-0 items-center gap-2 rounded-md px-2 hover:bg-hover"
@@ -317,14 +333,18 @@ export function ChartPanel() {
           <IconButton title="Download chart image" onClick={() => chartRef.current?.screenshot()}>
             <Camera size={16} />
           </IconButton>
+          <IconButton title={showTools ? "Hide drawing tools" : "Show drawing tools"} active={!showTools} onClick={toggleTools}>
+            <PenLine size={16} />
+          </IconButton>
           <IconButton title={fullscreen ? "Exit fullscreen" : "Fullscreen"} onClick={toggleFullscreen}>
             {fullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
           </IconButton>
+          {toolbarRight}
         </div>
       </div>
 
       <div className="flex min-h-0 flex-1">
-        <DrawingToolbar
+        {showTools && <DrawingToolbar
           activeTool={tool}
           onTool={setTool}
           magnet={prefs.magnet}
@@ -336,7 +356,7 @@ export function ChartPanel() {
           onClear={() => {
             if (window.confirm(`Remove all drawings on ${displaySymbol(symbol)}?`)) chartRef.current?.clearDrawings();
           }}
-        />
+        />}
         <div className="relative min-w-0 flex-1">
           {prefsLoaded && (
             <TradingChart

@@ -11,6 +11,7 @@ import { Spinner } from "./ui/primitives";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const ready = useApp((s) => s.ready);
+  const focus = useApp((s) => s.focusMode);
 
   useEffect(() => {
     initLocalState();
@@ -43,7 +44,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
-      <TopBar />
+      {!focus && <TopBar />}
       <main className="relative min-h-0 flex-1">
         {ready ? (
           children
